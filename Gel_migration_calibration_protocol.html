@@ -1,0 +1,399 @@
+<title>Gel Migration Calibration</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --ink:#16191c; --ink-2:#474f57; --ink-3:#727b84; --line:#d7dce1; --line-2:#b4bcc4;
+  --paper:#ffffff; --sunk:#f2f4f6; --accent:#9c3d12; --accent-soft:#fbeee6;
+  --warn:#a02617; --warn-soft:#fdecea; --ok:#1f6b52; --ok-soft:#e8f3ef;
+}
+*{box-sizing:border-box}
+body{background:#e8ebee;color:var(--ink);margin:0;
+  font-family:"Barlow Semi Condensed",system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.46}
+.sheet{max-width:860px;margin:0 auto;background:var(--paper);padding:0 34px;padding-block:30px 44px;
+  border:1px solid var(--line);box-shadow:0 1px 4px rgba(0,0,0,.07)}
+@media(max-width:620px){.sheet{padding-left:16px;padding-right:16px}}
+h1{font-size:31px;font-weight:700;margin:0;letter-spacing:-.013em;line-height:1.04}
+.meta{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11px;color:var(--ink-3);margin-bottom:5px}
+.lede{font-size:15.5px;color:var(--ink-2);margin:9px 0 0;max-width:68ch}
+.lede b{color:var(--ink)}
+.companion{font-size:13.5px;color:var(--ink-3);margin:9px 0 0;padding-left:11px;border-left:2px solid var(--line-2)}
+
+.stats{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--line-2);border-radius:3px;
+  margin:19px 0 4px;overflow:hidden}
+@media(max-width:700px){.stats{grid-template-columns:repeat(3,1fr)}}
+.stat{padding:8px 10px;border-right:1px solid var(--line)}
+.stat:last-child{border-right:0}
+.stat .k{font-family:"JetBrains Mono",monospace;font-size:16px;font-weight:700;line-height:1.1}
+.stat .l{font-size:9.5px;font-weight:600;letter-spacing:.085em;text-transform:uppercase;color:var(--ink-3);margin-top:2px}
+
+.toc{display:flex;flex-wrap:wrap;gap:2px 16px;font-size:12.5px;color:var(--ink-2);
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:7px 0;margin:14px 0 0}
+.toc a{color:var(--ink-2);text-decoration:none}
+.toc a:hover{color:var(--accent);text-decoration:underline}
+.toc .n{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--ink-3);margin-right:4px}
+
+section{margin-top:24px}
+.sh{display:flex;align-items:baseline;gap:10px;border-bottom:2px solid var(--ink);padding-bottom:5px;margin-bottom:11px}
+.sh .n{font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:700;color:var(--paper);
+  background:var(--ink);padding:2px 6px;border-radius:2px}
+.sh h2{font-size:19px;font-weight:700;margin:0;letter-spacing:-.005em}
+h3{font-size:13px;font-weight:700;margin:13px 0 4px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2)}
+p{margin:0 0 7px}
+.sub{color:var(--ink-2);font-size:14px}
+
+/* the rules */
+.rule{border-left:3px solid var(--accent);padding:2px 0 2px 13px;margin:13px 0}
+.rule h4{font-size:16px;font-weight:700;margin:0 0 3px;letter-spacing:-.004em}
+.rule h4 .r{font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:700;color:var(--accent);
+  margin-right:7px;vertical-align:1px}
+.rule p{margin:0 0 5px;font-size:14px;color:var(--ink-2)}
+.rule p:last-child{margin:0}
+.rule b{color:var(--ink)}
+
+table{width:100%;border-collapse:collapse;font-size:13px;margin:4px 0 8px}
+th{text-align:left;font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);
+  border-bottom:1px solid var(--line-2);padding:3px 9px 4px 0;white-space:nowrap}
+td{padding:4px 9px 4px 0;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right;padding-right:12px;font-family:"JetBrains Mono",monospace;
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.mono{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+td.yes{color:var(--warn);font-weight:700} td.no{color:var(--ink-3)}
+.tablescroll{overflow-x:auto}
+
+.note{border-left:3px solid var(--accent);background:var(--sunk);padding:8px 11px;margin:9px 0;border-radius:0 3px 3px 0}
+.note.warn{border-left-color:var(--warn);background:var(--warn-soft)}
+.note.ok{border-left-color:var(--ok);background:var(--ok-soft)}
+.lab{display:block;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:3px}
+.note.warn .lab{color:var(--warn)} .note.ok .lab{color:var(--ok)}
+.note p{margin:0 0 5px;font-size:13.5px} .note p:last-child{margin:0}
+
+code{font-family:"JetBrains Mono",monospace;font-size:11.5px;background:var(--sunk);
+  border:1px solid var(--line);border-radius:2px;padding:1px 4px}
+.eq{display:block;font-family:"JetBrains Mono",monospace;font-size:12.5px;background:var(--sunk);
+  border:1px solid var(--line);border-radius:3px;padding:9px 11px;margin:6px 0 9px;overflow-x:auto;
+  white-space:nowrap;line-height:1.75}
+ul.dash{margin:4px 0 8px;padding-left:17px} ul.dash li{margin:0 0 4px}
+.foot{border-top:1px solid var(--line);margin-top:28px;padding-top:9px;font-size:11.5px;color:var(--ink-3)}
+.foot b{color:var(--ink-2)}
+
+@media print{
+  body{background:#fff;font-size:8.8pt}
+  .sheet{max-width:none;border:0;box-shadow:none;padding:0}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  h1{font-size:19pt} .sh h2{font-size:11pt} h3{font-size:8pt} .rule h4{font-size:9.5pt}
+  table{font-size:7.8pt} .toc{display:none}
+  thead{display:table-header-group} tr{break-inside:avoid}
+  .note,.rule,.stats,table{break-inside:avoid}
+}
+@page{margin:12mm}
+</style>
+
+<div class="sheet">
+  <div class="meta">Standing protocol &middot; Victora Lab &middot; first issued 21 September 2026</div>
+  <h1>Gel migration calibration</h1>
+  <p class="lede"><b>A gel predicts nothing until it has been measured.</b> Fragment sizes are exact &mdash;
+    they come from the sequence. Everything between a fragment size and a position on the gel runs through a
+    model whose constants are literature values for somebody else's tank. This protocol replaces them with
+    measured ones for one rig, one buffer and one agarose percentage, and in the same run measures what the
+    imager can actually see.</p>
+  <p class="companion">Companion to <b>Regular DNA Electrophoresis Agarose Gel Protocol</b>, which covers
+    pouring and running. This document covers only what is different about a run whose purpose is measurement.</p>
+
+  <div class="stats">
+    <div class="stat"><div class="k">5</div><div class="l">timepoints</div></div>
+    <div class="stat"><div class="k">1</div><div class="l">agarose %</div></div>
+    <div class="stat"><div class="k">3</div><div class="l">ladder lanes</div></div>
+    <div class="stat"><div class="k">&ge; 1</div><div class="l">held-out digest</div></div>
+    <div class="stat"><div class="k">&frac12;</div><div class="l">row pitch, max RMSE</div></div>
+  </div>
+
+  <div class="toc">
+    <a href="#s1"><span class="n">01</span>The shape</a>
+    <a href="#s2"><span class="n">02</span>What is being fitted</a>
+    <a href="#s3"><span class="n">03</span>The rules</a>
+    <a href="#s4"><span class="n">04</span>Choosing the parameters</a>
+    <a href="#s5"><span class="n">05</span>Measuring</a>
+    <a href="#s6"><span class="n">06</span>Analysis and acceptance</a>
+    <a href="#s7"><span class="n">07</span>When to recalibrate</a>
+    <a href="#s8"><span class="n">08</span>Common failures</a>
+  </div>
+
+  <section id="s1">
+    <div class="sh"><span class="n">01</span><h2>The shape</h2></div>
+    <p class="sub">A calibration run produces four artefacts, named on the
+      <span class="mono">Exp&lt;MMDDYY&gt;</span> date code.</p>
+    <table>
+      <thead><tr><th>Artefact</th><th>What it is</th><th>Lives in</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">Exp&lt;MMDDYY&gt;.md</td><td>notebook record &mdash; design, reasoning, results, corrections</td><td>vault, Experiments/</td></tr>
+        <tr><td class="mono">..._protocol.html</td><td>full run sheet, with the reasoning behind every number</td><td>vault, embedded in the note</td></tr>
+        <tr><td class="mono">..._quicksheet.html</td><td>two pages: page 1 pours and loads, page 2 photographs and measures</td><td>printed, taped to the bench</td></tr>
+        <tr><td class="mono">..._model.json</td><td>the fitted constants, and the only output anything downstream consumes</td><td>run folder + the tool that uses it</td></tr>
+      </tbody>
+    </table>
+    <div class="note">
+      <span class="lab">Neither file stands alone</span>
+      <p>A calibration without the fourth file has not finished. A <span class="mono">model.json</span>
+        without the note that produced it cannot be trusted a year later.</p>
+    </div>
+  </section>
+
+  <section id="s2">
+    <div class="sh"><span class="n">02</span><h2>What is being fitted</h2></div>
+    <div class="eq">1/&mu;(L) = 1/&mu;<sub>L</sub> &minus; (1/&mu;<sub>L</sub> &minus; 1/&mu;<sub>S</sub>) &middot; exp(&minus;L/&gamma;)
+<br>d &nbsp; &nbsp; &nbsp; = d<sub>0</sub> + &mu;(L) &middot; E &middot; t<sub>ref</sub> &middot; (t/t<sub>ref</sub>)<sup>p</sup></div>
+    <table>
+      <thead><tr><th>Parameter</th><th>Controls</th><th>What constrains it</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">&mu;<sub>S</sub></td><td>speed of small fragments</td><td>the small ladder bands, any one photo</td></tr>
+        <tr><td class="mono">&mu;<sub>L</sub></td><td>speed of large fragments</td><td>the large ladder bands, any one photo</td></tr>
+        <tr><td class="mono">&gamma;</td><td>where the curve bends between them</td><td>the full ladder, any one photo</td></tr>
+        <tr><td class="mono">p</td><td>whether distance stays linear in time</td><td><b>the timepoints, and nothing else</b></td></tr>
+        <tr><td class="mono">d<sub>0</sub></td><td>constant offset in the measuring convention</td><td>all photos pooled</td></tr>
+        <tr><td class="mono">visMin, visFull</td><td>detection floor and saturation point</td><td>the dilution series</td></tr>
+      </tbody>
+    </table>
+    <div class="note">
+      <span class="lab">Why this is not a one-photograph experiment</span>
+      <p><span class="mono">p</span> is the reason. Every other parameter is pinned by a single endpoint
+        image, which is what an ordinary sizing gel gives you. If the buffer exhausts or the gel warms,
+        migration slows, and a model fitted at one endpoint is wrong everywhere except that endpoint, with
+        nothing on the gel to reveal it.</p>
+    </div>
+  </section>
+
+  <section id="s3">
+    <div class="sh"><span class="n">03</span><h2>The rules</h2></div>
+    <p class="sub">These are the ones that stop the recurring errors. Everything else is ordinary electrophoresis.</p>
+
+    <div class="rule">
+      <h4><span class="r">R1</span>Field comes from the electrode gap, never the gel length</h4>
+      <p><span class="mono">volts = V/cm &times; gap</span>. Measure the gap platinum to platinum and
+        <b>record it in the note</b>. A mini tank runs ~15 cm of buffer over a 7 cm gel, so computing V/cm
+        from gel length overstates the field about twofold. A run sheet that says "147 V" without the gap it
+        was computed for is not reusable on another box. Stay at or below <b>5 V/cm</b> &mdash; heat closes
+        small gaps and a calibration run is long.</p>
+    </div>
+
+    <div class="rule">
+      <h4><span class="r">R2</span>One agarose percentage per run</h4>
+      <p>Mobility constants are percentage-specific and a model fitted at 1.2 % does not transfer to 1.5 %.
+        Calibrate the percentage you actually intend to use, all the way to an accepted
+        <span class="mono">model.json</span>, before starting a second. Do not pour two percentages and read
+        them at one stop point.</p>
+    </div>
+
+    <div class="rule">
+      <h4><span class="r">R3</span>Five timepoints on one gel, photographed serially</h4>
+      <p>Not a single endpoint, and <b>not staggered loading</b>. Staggered loading gives five timepoints on
+        one image for far less handling and is the obvious shortcut, but it answers a different question: a
+        lane loaded at t = 20 min spends its whole life in an already-warm gel, so it does not represent a run
+        of that duration <em>starting from zero</em>, which is what any prediction has to be. Re-photographing
+        one gel follows the same molecules cumulatively.</p>
+      <p>Timepoints at 0.2, 0.4, 0.6, 0.8 and 1.0 of <span class="mono">t_max</span>.</p>
+    </div>
+
+    <div class="rule">
+      <h4><span class="r">R4</span>Power-on minutes, never wall clock</h4>
+      <p>Pause the stopwatch whenever the supply is off. Five gel removals cost 5&ndash;10 minutes of field
+        time; counted as run time they are indistinguishable from the drift being measured, and the fit will
+        quietly absorb them into <span class="mono">p</span>.</p>
+    </div>
+
+    <div class="rule">
+      <h4><span class="r">R5</span>Every frame carries its own scale, read at the plane of the DNA</h4>
+      <p>Each photograph is scaled independently and the results pooled, so every frame must resolve to the
+        same millimetre scale. Gels swell and the camera will not return to the same height, so gel
+        dimensions are not a substitute. Without a scale in the frame the photos cannot be combined and the
+        run yields nothing.</p>
+      <p><b>Use the comb as the primary scale.</b> Measure the well-to-well pitch once with calipers and the
+        well row becomes a known reference present in every frame &mdash; and, uniquely, one that sits at
+        the same depth as the DNA. Scale error from an off-plane reference is about
+        <span class="mono">&Delta;h / D</span>, height difference over camera distance: a ruler resting on the
+        transilluminator is ~3 mm below the DNA plane of a 6 mm gel, which at 300 mm camera distance is a
+        <b>1 % error, or 1 mm over a 100 mm run</b>. The wells have none.</p>
+      <p>Carry a ruler as well, for the cross-check and for anything outside the well row. It must be
+        dimensionally stable when wet and must not out-shine the bands: <b>laminated print or transparency
+        film with dark markings</b>. Never bare paper &mdash; it wicks buffer and swells, so its millimetres
+        stop being millimetres, and the optical brighteners in office paper fluoresce hard under UV and drive
+        the exposure down.</p>
+    </div>
+
+    <div class="rule">
+      <h4><span class="r">R6</span>Photo 1 is a measurement, not a photograph</h4>
+      <p>Measure it, refit the time scale, and rewrite the remaining timepoints before the gel runs on. An
+        uncalibrated prior can be wrong by a factor of two, and a schedule built on it will either run
+        fragments off the end or stop with everything bunched at the top.</p>
+      <p><b>The fractions are a convenience, not a requirement.</b> The fit needs four or five timepoints
+        spanning the run with accurately recorded power-on minutes; it does not care that they fall at
+        0.2 / 0.4 / 0.6 / 0.8 / 1.0 of <span class="mono">t_max</span>. Photographing at a fixed interval and
+        stopping on the ladder criterion satisfies this rule just as well, and is less to manage at the bench.
+        Refit the schedule only if you would rather not watch the gel.</p>
+      <p>If the observed / predicted ratio <b>varies across fragment sizes</b>, the model's shape is wrong and
+        not merely its speed. A single rescale will not fix that &mdash; take all five photos regardless.</p>
+    </div>
+
+    <div class="rule">
+      <h4><span class="r">R7</span>Hold out a real digest</h4>
+      <p>At least one plasmid digest, loaded and measured, is excluded from the fit. Fit residuals always
+        flatter themselves; the held-out RMSE is the only honest error estimate and the only number acceptance
+        is judged on.</p>
+      <p>Choose it by enumeration, not habit: <b>4&ndash;8 fragments, every band above the detection floor,
+        every band still on the gel at the last timepoint, and no two bands within 5 mm</b> at the final
+        timepoint. A second digest on a different plasmid with a different enzyme is the independent check.</p>
+    </div>
+
+    <div class="rule">
+      <h4><span class="r">R8</span>Sizes come from the maps, never from older notes</h4>
+      <p>Inherited from the genotyping standard and it applies unchanged. Every expected fragment is computed
+        in silico from the curated map. Record any correction in the note <b>with both values</b> &mdash; a
+        silent fix is indistinguishable from a typo next year.</p>
+    </div>
+
+    <div class="rule">
+      <h4><span class="r">R9</span>The dilution series has to go dark</h4>
+      <p>A complete digest is equimolar, so band mass is exactly proportional to fragment length and no
+        per-lot table is needed &mdash; the masses follow from the sequence. Run a two-fold series until bands
+        <b>disappear</b>.</p>
+      <p>A series in which every band stays visible fits <em>any</em> floor below the faintest one at zero
+        residual, and reports a perfect fit that means nothing. The threshold is identifiable only if some
+        bands fail to appear. Add loading dye <b>after</b> the dilutions are made, or it dilutes along with them.</p>
+    </div>
+
+    <div class="rule">
+      <h4><span class="r">R10</span>Score intensity only on early frames</h4>
+      <p>If stain is cast into the gel, it migrates. EtBr carries a positive charge and moves toward the
+        <b>cathode</b>, so by the last timepoint the lower gel is stain-depleted and faint bands there are an
+        artefact of the stain rather than of the DNA. Band <em>positions</em> in late frames remain valid;
+        <em>intensities</em> do not. Score the dilution series from photo 1 or 2.</p>
+    </div>
+
+    <div class="rule">
+      <h4><span class="r">R11</span>Judge the endpoint by the ladder, not the dye</h4>
+      <p>Also inherited. Give the run a <b>first check point</b> rather than a fixed duration, and a stop
+        criterion in terms of where a named ladder band sits. The smallest fragment of interest running off
+        the end is the failure mode that costs the whole run.</p>
+    </div>
+
+    <div class="rule">
+      <h4><span class="r">R12</span>Three ladders, not one</h4>
+      <p>Left, centre and right of the comb. One ladder fits the model; three also measure how much the gel
+        smiles, which decides whether the full comb is usable or only the central lanes.</p>
+    </div>
+  </section>
+
+  <section id="s4">
+    <div class="sh"><span class="n">04</span><h2>Choosing the parameters</h2></div>
+    <p class="sub">Nothing below is a fixed value. These are the rules for deriving them for a given run.</p>
+    <table>
+      <thead><tr><th>Parameter</th><th>How to derive it</th></tr></thead>
+      <tbody>
+        <tr><td><b>Agarose %</b></td><td>from the fragment range that matters, using the house assignments: 0.8 % above 3 kb, 1.0&ndash;1.2 % for plasmid digests and wide ranges, 1.5 % for 300&ndash;900 bp, 2&ndash;3 % for small products and tight pairs</td></tr>
+        <tr><td><b>Running room</b></td><td>measure the gel below the comb and <b>record it</b> &mdash; every derived timepoint scales with it. 1.2&ndash;1.5 % wants &ge; 70 mm, 100 mm is comfortable; a 3 % gel resolving a tight pair needs 80 mm minimum</td></tr>
+        <tr><td><b>Load</b></td><td>enough that every band of the validation digest clears the expected floor with margin. Work it out, do not use habit</td></tr>
+      </tbody>
+    </table>
+    <h3>t_max &mdash; when the smallest fragment of interest reaches the end</h3>
+    <div class="eq">t_max = usable_mm / ( &mu;(L_small) &middot; E ) &nbsp; &nbsp; less a 5 mm margin</div>
+    <p class="sub">Computed from the current prior, then corrected after photo 1 (R6). Anything smaller than
+      <span class="mono">L_small</span> is expected to run off and is not measured.</p>
+    <h3>Load per band</h3>
+    <div class="eq">mass_band = len_band / len_plasmid &times; load</div>
+    <h3>Achievable grid, if the model feeds a band-placement tool</h3>
+    <div class="eq">max_rows = usable_mm / ( 2 &middot; sqrt( rmse&sup2; + (band_width/2)&sup2; ) )</div>
+    <p class="sub">with <span class="mono">band_width</span> 2&ndash;3 mm, per the house rule that
+      "3.2 mm is about one band width &mdash; too tight to call confidently". The row pitch you intend to use
+      also sets the acceptance threshold in section 06.</p>
+  </section>
+
+  <section id="s5">
+    <div class="sh"><span class="n">05</span><h2>Measuring</h2></div>
+    <ul class="dash">
+      <li>Scale <b>each photo separately</b> from its own ruler. Never carry a scale between frames.</li>
+      <li>Prefer a lane profile (Fiji: rectangle down the lane, <b>Analyze &rsaquo; Plot Profile</b>) to
+        eyeballing. It gives reproducible peak centres, and intensity for the dilution series at no extra cost.</li>
+      <li>Measure <b>leading (anode) edge of the well to centre of band</b>, consistently. A constant offset
+        is fitted out as <span class="mono">d<sub>0</sub></span>; an inconsistent one is not.</li>
+      <li>Leave a row blank for a band that ran off or cannot be read. <b>Never estimate a position.</b></li>
+    </ul>
+  </section>
+
+  <section id="s6">
+    <div class="sh"><span class="n">06</span><h2>Analysis and acceptance</h2></div>
+    <p class="sub">Fit in two stages so the extra parameters must earn their place: stage 1 strictly linear in
+      time, stage 2 adding drift and offset, with stage 2 adopted only if it is more than 10 % better. Use a
+      robust loss, so a single mis-measured band surfaces in an outlier list instead of dragging the model.</p>
+    <table>
+      <thead><tr><th>Output</th><th>How to read it</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">drift diagnostic</td><td>flat = migration linear in time; a monotonic walk from early-negative to late-positive = it is not</td></tr>
+        <tr><td class="mono"><b>held-out RMSE</b></td><td><b>the number acceptance is judged on</b></td></tr>
+        <tr><td class="mono">smiling</td><td>&gt; 1.5 mm at the 90th percentile: use central lanes only, or drop the voltage</td></tr>
+        <tr><td class="mono">outliers</td><td>&gt; 3 mm off; re-measure those bands before believing anything else</td></tr>
+        <tr><td class="mono">visibility</td><td>must report a value, not UNDETERMINED</td></tr>
+      </tbody>
+    </table>
+    <div class="note ok">
+      <span class="lab">Accept</span>
+      <p>When the <b>held-out RMSE is below half the row pitch</b> you intend to use. Below that, a band lands
+        where it was predicted to. For a 20-row grid over 100 mm the pitch is 5 mm and the bar is 2.5 mm; on
+        simulated data with 0.25 mm measurement noise the fit recovers a known drifting gel to 0.29 mm, so that
+        bar is comfortable rather than strained.</p>
+    </div>
+    <div class="note warn">
+      <span class="lab">Reject and repeat</span>
+      <p>If visibility comes back UNDETERMINED (extend the dilution series downward), if outliers survive
+        re-measurement (suspect the digest &mdash; check for a partial on its own gel), or if smiling exceeds
+        the lane span you need.</p>
+    </div>
+  </section>
+
+  <section id="s7">
+    <div class="sh"><span class="n">07</span><h2>When to recalibrate</h2></div>
+    <div class="tablescroll">
+    <table>
+      <thead><tr><th>Change</th><th>Recalibrate?</th></tr></thead>
+      <tbody>
+        <tr><td>Different agarose percentage</td><td class="yes">Yes &mdash; constants are percentage-specific</td></tr>
+        <tr><td>Different tank, or a different electrode gap</td><td class="yes">Yes &mdash; and record the new gap</td></tr>
+        <tr><td>Different buffer system, or TAE made to a different recipe</td><td class="yes">Yes</td></tr>
+        <tr><td>New stain, or switching cast-in to post-stain</td><td class="yes">Positions no, <b>visibility yes</b></td></tr>
+        <tr><td>New imager or camera setup</td><td class="yes">Positions no, <b>visibility yes</b></td></tr>
+        <tr><td>Different V/cm on the same rig</td><td class="no">No &mdash; E is an explicit term in the model</td></tr>
+        <tr><td>Different run time</td><td class="no">No &mdash; that is the point of fitting p</td></tr>
+        <tr><td>New agarose lot, same supplier and percentage</td><td class="no">No, but note it; if residuals grow, suspect it first</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <section id="s8">
+    <div class="sh"><span class="n">08</span><h2>Common failures</h2></div>
+    <div class="tablescroll">
+    <table>
+      <thead><tr><th>Symptom</th><th>Cause</th></tr></thead>
+      <tbody>
+        <tr><td>Held-out RMSE good, predictions still wrong in use</td><td>calibrated at one percentage, applied at another (R2)</td></tr>
+        <tr><td>Drift term large and implausible</td><td>wall-clock time recorded instead of power-on minutes (R4)</td></tr>
+        <tr><td>Frames disagree with each other</td><td>scale carried between photos instead of read from each frame (R5)</td></tr>
+        <tr><td>All distances off by a constant percentage</td><td>scale read off-plane &mdash; use the comb pitch, which sits at the depth of the DNA (R5)</td></tr>
+        <tr><td>Gel underexposed, ruler blown out</td><td>bare paper ruler; its optical brighteners fluoresce under UV (R5)</td></tr>
+        <tr><td>Visibility UNDETERMINED</td><td>dilution series never went dark (R9)</td></tr>
+        <tr><td>Faint bands only at the bottom of late frames</td><td>stain depletion, not DNA &mdash; rescore from photo 1 (R10)</td></tr>
+        <tr><td>Every band shifted by a constant</td><td>measuring convention changed mid-run; d<sub>0</sub> absorbs one offset, not two</td></tr>
+        <tr><td>Smallest fragments missing entirely</td><td>ran past t_max; the stop criterion was the dye, not the ladder (R11)</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <div class="foot">
+    <b>Worked example: Exp092026</b> &mdash; 1.2 % TAE, 4 V/cm on a 36.8 cm box, 20-well comb,
+    <span class="mono">A_5 / SphI</span> and <span class="mono">A_16 / BsrBI</span> held out, two-fold
+    dilution series down to 0.37 ng in the smallest band.<br>
+    Built to the pattern of <b>Genotyping protocol standard</b> &mdash; three artefacts, V/cm not volts, a
+    per-gel check point, and sizes from maps rather than notes.
+  </div>
+</div>

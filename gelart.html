@@ -1,0 +1,702 @@
+<title>Gel Art</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#EFF2F1; --surface:#FFFFFF; --sunk:#E4E9E7; --line:#D3DAD7; --line-strong:#B8C2BE;
+  --ink:#121716; --ink-2:#48534E; --ink-3:#79837E;
+  --accent:#B55516; --accent-ink:#FFFFFF; --accent-soft:#F6E5D7;
+  --good:#256F5E; --warn:#A5331F;
+  --shadow:0 1px 2px rgba(18,23,22,.06), 0 6px 18px rgba(18,23,22,.05);
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+  --bg:#0E1211; --surface:#171D1B; --sunk:#111615; --line:#2A312E; --line-strong:#3C453F;
+  --ink:#E7ECE9; --ink-2:#A5AFAA; --ink-3:#78827D;
+  --accent:#E79445; --accent-ink:#1A1105; --accent-soft:#2B2018;
+  --good:#5FBFA4; --warn:#E0715A;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3);
+}}
+:root[data-theme="dark"]{
+  --bg:#0E1211; --surface:#171D1B; --sunk:#111615; --line:#2A312E; --line-strong:#3C453F;
+  --ink:#E7ECE9; --ink-2:#A5AFAA; --ink-3:#78827D;
+  --accent:#E79445; --accent-ink:#1A1105; --accent-soft:#2B2018;
+  --good:#5FBFA4; --warn:#E0715A;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:Barlow,system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.5;margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px;padding-block:24px 48px}
+h1,h2,h3{font-family:"Barlow Semi Condensed",system-ui,sans-serif;margin:0;text-wrap:balance}
+h1{font-size:clamp(30px,5.2vw,44px);font-weight:700;letter-spacing:-.015em;line-height:1.02}
+h2{font-size:13px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-2)}
+h3{font-size:16px;font-weight:600}
+.eyebrow{font-family:"Barlow Semi Condensed",sans-serif;font-size:12px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--accent)}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+
+header{display:flex;flex-wrap:wrap;gap:20px 32px;align-items:flex-end;justify-content:space-between;border-bottom:2px solid var(--ink);padding-bottom:16px;margin-bottom:22px}
+.lede{color:var(--ink-2);max-width:56ch;margin:8px 0 0;font-size:15.5px}
+.conditions{font-family:"JetBrains Mono",monospace;font-size:12.5px;line-height:1.85;color:var(--ink-2);text-align:right;font-variant-numeric:tabular-nums}
+.conditions b{color:var(--ink);font-weight:700}
+
+.layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:20px;align-items:start}
+@media(max-width:880px){.layout{grid-template-columns:1fr}}
+.rail{display:flex;flex-direction:column;gap:14px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}
+@media(max-width:880px){.rail{position:static}}
+.stage{display:flex;flex-direction:column;gap:14px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px;box-shadow:var(--shadow)}
+.card>h2{margin-bottom:10px}
+
+/* shape catalog */
+.cat{display:flex;flex-direction:column;gap:1px;max-height:330px;overflow-y:auto;margin:0 -6px}
+.cat button{display:grid;grid-template-columns:1fr auto;gap:2px 8px;width:100%;text-align:left;background:none;border:0;border-radius:4px;padding:6px;cursor:pointer;color:inherit;font:inherit}
+.cat button:hover{background:var(--sunk)}
+.cat button[aria-pressed="true"]{background:var(--accent-soft);box-shadow:inset 2px 0 0 var(--accent)}
+.cat .nm{font-family:"Barlow Semi Condensed",sans-serif;font-weight:600;font-size:15px}
+.cat .q{font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+.cat .meta{grid-column:1/-1;font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--ink-3);letter-spacing:-.01em}
+.bar{grid-column:1/-1;height:3px;background:var(--sunk);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+
+.ctl{display:flex;flex-direction:column;gap:12px}
+.ctl label{display:block;font-family:"Barlow Semi Condensed",sans-serif;font-size:11.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.ctl .val{float:right;font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--ink);letter-spacing:0;text-transform:none;font-weight:500}
+input[type=range]{width:100%;accent-color:var(--accent);margin:0}
+select{width:100%;font:inherit;font-size:14px;padding:5px 7px;border:1px solid var(--line-strong);border-radius:4px;background:var(--surface);color:var(--ink)}
+textarea{width:100%;font-family:"JetBrains Mono",monospace;font-size:11.5px;line-height:1.5;padding:6px 7px;border:1px solid var(--line-strong);border-radius:4px;background:var(--surface);color:var(--ink);resize:vertical}
+.note.warn{border-left-color:var(--warn)}
+.note.warn .lab{color:var(--warn)}
+.offpanel{color:var(--warn);font-weight:700}
+.offpanel::after{content:"*"}
+.faint{opacity:.45;text-decoration:line-through}
+.runoff{opacity:.45;font-style:italic}
+td.tot,th.tot{font-weight:700}
+tfoot td{border-top:1px solid var(--line-strong);border-bottom:0;font-weight:700;padding-top:6px}
+.seg{display:flex;gap:0;border:1px solid var(--line-strong);border-radius:4px;overflow:hidden}
+.seg button{flex:1;background:var(--surface);border:0;border-right:1px solid var(--line);padding:6px 4px;cursor:pointer;color:var(--ink-2);font-family:"Barlow Semi Condensed",sans-serif;font-size:13px;font-weight:600}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.checks{display:flex;gap:14px;flex-wrap:wrap}
+.checks label{display:flex;align-items:center;gap:6px;margin:0;text-transform:none;letter-spacing:0;font-size:13px;color:var(--ink-2);cursor:pointer}
+.checks input{accent-color:var(--accent);margin:0}
+button.act{width:100%;background:var(--ink);color:var(--bg);border:0;border-radius:4px;padding:9px;font-family:"Barlow Semi Condensed",sans-serif;font-size:14px;font-weight:600;letter-spacing:.04em;cursor:pointer}
+button.act:hover{background:var(--accent);color:var(--accent-ink)}
+button.act:disabled{opacity:.5;cursor:default}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* gel */
+.gelcard{background:var(--sunk);padding:12px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.gelframe{background:#0B0D0C;border-radius:3px;padding:8px;line-height:0;max-width:100%;overflow-x:auto}
+canvas{display:block;max-width:100%}
+.gelfoot{display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:center;font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--ink-2)}
+
+.scoreline{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px}
+.score{font-family:"JetBrains Mono",monospace;font-size:26px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.pill{display:inline-block;font-family:"Barlow Semi Condensed",sans-serif;font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:99px;border:1px solid currentColor}
+.cmpwrap{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;margin-top:10px}
+.legend{font-size:12.5px;color:var(--ink-2);max-width:34ch}
+.legend b{color:var(--ink)}
+.swatch{display:inline-block;width:9px;height:9px;border-radius:2px;vertical-align:-1px;margin-right:3px}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-family:"Barlow Semi Condensed",sans-serif;font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:4px 8px 5px 0;border-bottom:1px solid var(--line-strong);white-space:nowrap}
+td{padding:5px 8px 5px 0;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right;padding-right:12px;font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+.enz{font-family:"JetBrains Mono",monospace;font-size:12.5px;font-weight:500}
+.frag{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--ink-3);letter-spacing:-.02em}
+.src{font-family:"Barlow Semi Condensed",sans-serif;font-weight:600;font-size:13.5px}
+.tablescroll{overflow-x:auto}
+.empty td{color:var(--ink-3);font-style:italic}
+
+.note{border-left:3px solid var(--accent);background:var(--sunk);padding:10px 12px;border-radius:0 4px 4px 0;font-size:13.5px;color:var(--ink-2)}
+.note .lab{display:block;font-family:"Barlow Semi Condensed",sans-serif;font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:3px}
+.note b{color:var(--ink)}
+.dirs{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:18px 26px}
+.dirs article>h3{margin-bottom:4px;color:var(--ink)}
+.dirs p{margin:0;font-size:13.5px;color:var(--ink-2)}
+.dirs b{color:var(--ink);font-weight:600}
+footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+footer p{margin:0 0 7px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+<header>
+  <div>
+    <div class="eyebrow">Restriction digest &middot; agarose gel</div>
+    <h1>Gel Art</h1>
+    <p class="lede">Pick a shape; the solver searches digests of your 42 plasmids for the enzyme sets whose
+      fragments land on the right rows. Every band is computed from the real sequence, using only enzymes
+      the lab stocks.</p>
+  </div>
+  <div class="conditions" id="cond"></div>
+</header>
+
+<div class="layout">
+  <aside class="rail">
+    <section class="card">
+      <h2>Shape catalogue</h2>
+      <div class="cat" id="cat"></div>
+    </section>
+
+    <section class="card">
+      <h2>Run conditions</h2>
+      <div class="ctl">
+        <div>
+          <label for="time"><span class="val" id="timeval"></span>Run time</label>
+          <input type="range" id="time" min="20" max="240" step="5">
+        </div>
+        <div>
+          <label for="pct"><span class="val" id="pctval"></span>Agarose</label>
+          <input type="range" id="pct" min="0.7" max="2" step="0.1">
+        </div>
+        <div>
+          <label for="vcm"><span class="val" id="vcmval"></span>Field</label>
+          <input type="range" id="vcm" min="2" max="6" step="0.5">
+        </div>
+        <div>
+          <label for="load"><span class="val" id="loadval"></span>DNA per lane</label>
+          <input type="range" id="load" min="100" max="1500" step="50">
+        </div>
+        <div>
+          <label>Image</label>
+          <div class="seg" id="pal">
+            <button data-p="uv" aria-pressed="true">EtBr / UV</button>
+            <button data-p="gray" aria-pressed="false">Greyscale</button>
+            <button data-p="blue" aria-pressed="false">Blue light</button>
+          </div>
+        </div>
+        <div>
+          <label for="panel">Enzyme panel</label>
+          <select id="panel">
+            <option value="lab">Victora lab stock</option>
+            <option value="all">Every enzyme in the table</option>
+            <option value="common">6+ bp and degenerate</option>
+            <option value="six">6+ bp cutters only</option>
+            <option value="frequent">4-5 bp frequent cutters</option>
+            <option value="stock">My stock list</option>
+          </select>
+        </div>
+        <div id="stockwrap" hidden>
+          <label for="stock"><span class="val" id="stockcount"></span>Enzymes on hand</label>
+          <textarea id="stock" rows="4" placeholder="Paste your freezer list, any separator: BamHI EcoRI HindIII PstI SalI XhoI NcoI NdeI"></textarea>
+        </div>
+        <div>
+          <label>Enzymes per digest</label>
+          <div class="seg" id="maxenz">
+            <button data-m="1">1</button><button data-m="2" aria-pressed="true">2</button><button data-m="3">3</button>
+          </div>
+        </div>
+        <div>
+          <label>One buffer per digest</label>
+          <div class="seg" id="minact">
+            <button data-a="0">Off</button><button data-a="50" aria-pressed="true">&ge;50%</button><button data-a="75">&ge;75%</button><button data-a="100">100%</button>
+          </div>
+        </div>
+        <div class="checks">
+          <label><input type="checkbox" id="ruler" checked> Ruler</label>
+          <label><input type="checkbox" id="grid"> Row grid</label>
+          <label><input type="checkbox" id="ladder" checked> Ladder lane</label>
+        </div>
+        <button class="act" id="resolve">Re-solve at these conditions</button>
+      </div>
+    </section>
+  </aside>
+
+  <div class="stage">
+    <section class="card gelcard">
+      <div class="gelframe"><canvas id="gel"></canvas></div>
+      <div class="gelfoot" id="gelfoot"></div>
+    </section>
+
+    <section class="card">
+      <h2>Target vs predicted</h2>
+      <div class="scoreline">
+        <span class="score" id="score"></span>
+        <span class="pill" id="scorepill"></span>
+        <span class="mono" style="font-size:12.5px;color:var(--ink-2)" id="scoredetail"></span>
+      </div>
+      <div class="cmpwrap">
+        <canvas id="cmp"></canvas>
+        <div class="legend">
+          <p style="margin:0 0 6px"><span class="swatch" style="background:var(--accent)"></span><b>Outline</b> &mdash; the row the shape asks for.</p>
+          <p style="margin:0 0 6px"><span class="swatch" style="background:var(--ink-2)"></span><b>Fill</b> &mdash; predicted band intensity at that row.</p>
+          <p style="margin:0">An outlined cell with no fill is a band that failed to appear; a filled cell with
+            no outline is a stray fragment. Each row is <span class="mono" id="rowpitch"></span> of gel.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Lane recipes</h2>
+      <div class="note warn" id="panelwarn" hidden style="margin-bottom:12px">
+        <span class="lab">Not in your panel</span>
+        <p style="margin:0" id="panelwarntext"></p>
+      </div>
+      <div class="tablescroll">
+        <table>
+          <thead><tr>
+            <th class="n">Lane</th><th>Source</th><th>Enzymes</th><th class="n">&deg;C</th><th>Fragments (bp)</th>
+          </tr></thead>
+          <tbody id="recipes"></tbody>
+        </table>
+      </div>
+      <p class="legend" style="margin:8px 0 0"><span class="faint">struck through</span> = below the
+        detection floor or run off the end of the gel, so it will not appear as a pixel.</p>
+    </section>
+
+    <section class="card">
+      <h2>Digest plan</h2>
+      <p class="legend" style="margin:0 0 10px;max-width:none">One reaction per distinct digest, aliquoted
+        across the lanes that share it. Sized for <span class="mono" id="planload"></span> on the gel per lane
+        plus 20% overage.</p>
+      <div class="tablescroll">
+        <table>
+          <thead><tr>
+            <th>Digest</th><th>Buffer</th><th class="n">Lanes</th><th class="n">DNA</th><th class="n">Reaction</th>
+            <th class="n">Units each</th><th class="n">Load/lane</th><th class="n">&deg;C</th>
+          </tr></thead>
+          <tbody id="plan"></tbody>
+          <tfoot id="planfoot"></tfoot>
+        </table>
+      </div>
+      <div class="note warn" id="glywarn" hidden style="margin-top:12px">
+        <span class="lab">Glycerol above 5%</span>
+        <p style="margin:0" id="glywarntext"></p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Reading the gel</h2>
+      <div class="note">
+        <span class="lab">Judge by the ladder, not the dye</span>
+        <p style="margin:0">First check point at <b id="checkat"></b>. Stop when the ladder shows the smallest
+          fragment in the panel still on the gel &mdash; a fragment that runs off is scored as a missing pixel, not a faint one.</p>
+      </div>
+    </section>
+  </div>
+</div>
+
+<section class="card" style="margin-top:20px">
+  <h2>Where this goes next</h2>
+  <div class="dirs">
+    <article>
+      <h3>Stepped combs</h3>
+      <p>A comb whose teeth sit at different heights gives every lane its own origin &mdash; an <b>additive</b>
+         offset, independent of the chemistry. The comb then draws the coarse outline and the digest fills in
+         detail. This is the biggest single lever available: Diagonal, Chevron and Wave all fail here
+         (~57%) for the same reason &mdash; they need a smooth monotonic sweep that pUC19's fragment set cannot
+         produce &mdash; and a stepped comb supplies exactly that. 3D-printable, but teeth need flat bottoms and
+         an inert filament, and a tooth set lower has less running room beneath it.</p>
+    </article>
+    <article>
+      <h3>Staggered loading</h3>
+      <p>Pause the supply, load later lanes, resume. The shift this produces is <b>multiplicative</b> &mdash;
+         it scales with each fragment's own mobility rather than displacing the whole lane equally, which
+         is what a comb does. So the two controls are mathematically independent and compose into a much
+         larger reachable set than either alone. The cost is that a lane loaded into an already-warm gel
+         runs faster than one loaded at time zero, which is the same drift the calibration exists to measure.</p>
+    </article>
+    <article>
+      <h3>Shaped and gradient gels</h3>
+      <p>Casting an agarose gradient makes mobility a function of <em>position</em>, warping the size-to-distance
+         map across the gel instead of applying one curve everywhere &mdash; regions could be compressed or expanded
+         to suit different parts of the image. Harder to pour reproducibly and harder to calibrate. Note that
+         merely shaping the gel's lower edge changes only where fragments run off, not where bands sit.</p>
+    </article>
+    <article>
+      <h3>False colour</h3>
+      <p>Intercalating stains emit in a single band, so colour has to be added after capture rather than
+         acquired. Keying hue to the digest that produced each band is legible and defensible; presenting it
+         as multi-channel acquisition is not. Labelled as false colour, it stays publishable &mdash; and since the
+         app already knows which enzymes made every band, the mapping is free.</p>
+    </article>
+    <article>
+      <h3>More sources widen the alphabet</h3>
+      <p>This one is already done, and it mattered more than anything else tried. On pUC19 and pBR322 alone,
+         Diagonal, Chevron and Wave were unreachable &mdash; 55 to 59%, because no single plasmid's fragment
+         ladder produces a smooth monotonic sweep. Opening the search to all 42 plasmids lifted them to
+         <b>88 to 91%</b>, and did it while <em>tightening</em> the limit from three enzymes per digest to two.
+         Each lane now picks whichever source places its bands best, so the reachable set grows combinatorially
+         rather than additively. 27 of the 42 get used across the catalogue.</p>
+    </article>
+  </div>
+</section>
+
+<footer>
+  <p><b>The migration model is not yet calibrated to this rig.</b> Band positions come from a literature
+     Van Winkle mobility model for TAE, and the run times it predicts disagree with the run sheets in
+     Gen091226 by roughly twofold. Treat the shapes as achievable, the clock as provisional.</p>
+  <p>Sequences are read straight from the SnapGene files in <span class="mono">PlasmidDB/</span> (A_1 to A_51,
+     40 circular plasmids, 2961 to 22895 bp) plus pUC19 L09137.2 and pBR322 J01749.1. The digest engine
+     reproduces the published EcoRI, BamHI, HindIII, DraI and PvuII fragment sets exactly. Volts are derived
+     from V/cm across the 36.8 cm electrode gap.</p>
+  <p>The enzyme panel is the VICTORA_LAB SnapGene set of 2021 combined with the enzymes that appear in
+     2023&ndash;2026 bench notes but are missing from it, since that file has gone stale. 88 of those 95 names
+     exist in the digest engine; BfuAI, BmgBI, BsaAI, DpnI, PluTI, PspXI and SgrAI do not, so they are never
+     proposed.</p>
+  <p>Buffer activity is parsed from NEB's published <em>Performance Chart for Restriction Enzymes</em> (2025):
+     percent activity in r1.1, r2.1, r3.1 and rCutSmart for all 88 lab enzymes, with no value inferred. A digest
+     is only proposed if one buffer carries every enzyme in it to the chosen threshold, and the table names the
+     buffer and its worst-case activity. Where NEB now charts only an HF or v2 product, the recipe names
+     <em>that</em> tube &mdash; KpnI-HF, BsaI-HFv2 &mdash; since the engineered variants have their own buffer
+     profiles. Star-activity risks flagged by the chart are marked, and required cofactors (SAM for AcuI,
+     BpuEI, BsgI and MmeI) are added to the buffer cell. Requiring one buffer per digest costs nothing here:
+     the worst quality change across all 16 shapes was 0.0 points.</p>
+  <p>That table was cross-checked against an unrelated source &mdash; the REBASE file
+     <span class="mono">msbuffmore.txt</span> in the local Geneious data, which lists NEB's recommended buffer
+     for 1482 enzymes. 176 of 193 supplied buffers agree. Every one of the 17 differences is explained rather
+     than unresolved: 15 are the parent-versus-variant distinction (REBASE gives KpnI in r1.1, the chart gives
+     KpnI-HF in rCutSmart &mdash; both correct, about different tubes), and BstYI and HincII are cases where
+     REBASE, dated 8/24, predates the 2025 chart. Agreement between two independently derived sources is the
+     reason to trust these numbers; the parent/variant split is also why the recipe always names the product.</p>
+</footer>
+</div>
+
+<script src="src/buffers.js"></script>
+<script src="src/core.js"></script>
+<script src="src/render.js"></script>
+<script src="src/data.js"></script>
+<script src="src/data.local.js"></script><!-- optional, untracked: a private catalog that overrides the demo one -->
+
+<script>
+(function(){
+'use strict';
+var G = window.GelArt, R = window.GelRender, D = window.GELART_DATA;
+var CAT = D.catalog;
+var P = D.seqs.map(function(s){ return {name:s.name, seq:s.seq, circular:s.circular, acc:s.acc}; });
+// catalogue lane.p indexes the plasmid list used at precompute time \u2014 map by name, not position
+var PMAP = CAT.plasmids.map(function(cp){ var i = P.findIndex(function(p){ return p.name === cp.name; }); return i < 0 ? 0 : i; });
+
+var S = { shape:0, time:CAT.shapes[0].time, pct:CAT.gel.pct, vcm:CAT.gel.vcm,
+          load:CAT.gel.loadNg, palette:'uv', ruler:true, grid:false, ladder:true, custom:null,
+          panel:'lab', stock:[], maxEnz:2, aliquot:10, minAct:50 };
+// The plasmids the catalogue was solved over, in catalogue index order.
+var SOLVE_P = PMAP.map(function(i){ return P[i]; });
+
+var $ = function(id){ return document.getElementById(id); };
+function gelCfg(){
+  var g = {}; for (var k in CAT.gel) g[k] = CAT.gel[k];
+  g.pct = S.pct; g.vcm = S.vcm; g.time = S.time; g.loadNg = S.load; delete g.model;
+  return g;
+}
+function shape(){ return S.custom || CAT.shapes[S.shape]; }
+
+// Cutting the same plasmid with the same enzymes always gives the same fragments, so cache across redraws.
+var digestCache = {};
+function digestOf(l){
+  var p = P[PMAP[l.p]], k = p.name + ':' + l.e.join('+');
+  return digestCache[k] || (digestCache[k] = { p: p, frags: G.digest(p, l.e) });
+}
+function buildLanes(sh, gel){
+  return sh.lanes.map(function(l){
+    if (!l) return { bands:[], fragments:[], empty:true };
+    var d = digestOf(l), sb = G.sharedBuffer(l.e, S.minAct);
+    var supp = [];
+    l.e.forEach(function(n){ var s = G.ENZYME_BY_NAME[n] && G.ENZYME_BY_NAME[n].supplement; if (s && supp.indexOf(s) < 0) supp.push(s); });
+    return { bands: G.laneBands(d.frags, gel), fragments: d.frags, enzymes: l.e, plasmid: d.p.name, temp: l.T,
+             products: l.pr || l.e, buffer: sb, supp: supp, noBuffer: !sb && l.e.length > 1 };
+  });
+}
+// Pure pixel agreement. The solver's own score also carries its per-enzyme bench-cost penalty, so it runs
+// 1-3% lower; this is the number that matches what the gel actually looks like.
+function fidelity(sh, art, gel){
+  var err = 0, on = 0, rows = gel.rows;
+  for (var i = 0; i < sh.target.length; i++){
+    var prof = art[i] && art[i].bands.length ? G.rowIntensity(art[i].bands, gel) : null;
+    for (var r = 0; r < rows; r++){
+      var t = sh.target[i][r] === '1' ? 1 : 0, v = prof ? Math.min(1, prof[r]) : 0;
+      on += t; err += t ? 1 - v : v;
+    }
+  }
+  return { err:err, on:on, q: on ? Math.max(0, 1 - err/on) : 0 };
+}
+
+function drawCompare(art, gel){
+  var sh = shape(), c = $('cmp'), cols = sh.target.length, rows = gel.rows;
+  var cell = 13, dpr = window.devicePixelRatio || 1;
+  var w = cols * cell + 1, h = rows * cell + 1;
+  c.width = w * dpr; c.height = h * dpr;
+  c.style.width = w + 'px'; c.style.height = h + 'px';
+  var x = c.getContext('2d');
+  x.setTransform(dpr,0,0,dpr,0,0);
+  var cs = getComputedStyle(document.documentElement);
+  var ink = cs.getPropertyValue('--ink-2').trim(), acc = cs.getPropertyValue('--accent').trim();
+  var sunk = cs.getPropertyValue('--sunk').trim(), line = cs.getPropertyValue('--line').trim();
+  x.fillStyle = sunk; x.fillRect(0,0,w,h);
+  for (var i = 0; i < cols; i++){
+    var prof = art[i] && art[i].bands.length ? G.rowIntensity(art[i].bands, gel) : null;
+    for (var r = 0; r < rows; r++){
+      var v = prof ? Math.min(1, prof[r]) : 0, px = i*cell + .5, py = r*cell + .5;
+      x.fillStyle = line; x.fillRect(px, py, cell, cell);
+      if (v > 0.02){ x.globalAlpha = 0.12 + 0.88*v; x.fillStyle = ink; x.fillRect(px+1, py+1, cell-2, cell-2); x.globalAlpha = 1; }
+      if (sh.target[i][r] === '1'){ x.strokeStyle = acc; x.lineWidth = 1.5; x.strokeRect(px+1, py+1, cell-2, cell-2); }
+    }
+  }
+}
+
+// Fragments as they will actually read on the gel: struck through when too little DNA to see,
+// or when they have run off the end. A fragment you cannot see is a missing pixel, not a faint one.
+function fmtFrags(l){
+  var b = l.bands || [];
+  if (!b.length) return '';
+  var out = [];
+  for (var i = 0; i < Math.min(b.length, 10); i++){
+    var s = String(b[i].len);
+    if (b[i].offGel) out.push('<span class="runoff" title="run off the gel">' + s + '</span>');
+    else if (b[i].vis <= 0) out.push('<span class="faint" title="' + b[i].mass.toFixed(1) + ' ng, below the detection floor">' + s + '</span>');
+    else out.push(s);
+  }
+  return out.join(' \u00b7 ') + (b.length > 10 ? ' \u00b7 +' + (b.length - 10) + ' more' : '');
+}
+
+// One reaction per distinct digest, split across the lanes that share it.
+// NEB convention: 1 unit cuts 1 ug in 1 h, so 10 U/ug gives a comfortable margin on supercoiled plasmid.
+function digestPlan(art){
+  var by = {}, order = [];
+  art.forEach(function(l, i){
+    if (l.empty) return;
+    var k = l.plasmid + ' / ' + l.enzymes.join(' + ');
+    if (!by[k]) { by[k] = { plasmid: l.plasmid, enzymes: l.enzymes, products: l.products, buffer: l.buffer, supp: l.supp, temp: l.temp || 37, lanes: [] }; order.push(k); }
+    by[k].lanes.push(i + 1);
+  });
+  return order.map(function(k){
+    var d = by[k], n = d.lanes.length;
+    var dnaNg = Math.ceil(n * S.load * 1.2 / 100) * 100;          // 20% overage, rounded up to 100 ng
+    var vol = Math.max(20, Math.ceil(n * S.aliquot * 1.2 / 5) * 5);
+    var units = Math.max(5, Math.ceil(dnaNg / 1000 * 10));         // 10 U per ug, per enzyme
+    var enzUl = units / 20 * d.enzymes.length;                     // assuming 20 U/ul stocks
+    return {
+      key: k, plasmid: d.plasmid, enzymes: d.enzymes, products: d.products, buffer: d.buffer, supp: d.supp,
+      temp: d.temp, lanes: d.lanes, n: n,
+      dnaUg: dnaNg / 1000, vol: vol, units: units, enzUl: enzUl, gly: enzUl / vol * 100,
+      perLane: vol / n
+    };
+  });
+}
+
+function allowed(){
+  if (S.panel === 'all') return null;
+  var list = S.panel === 'stock' ? S.stock : G.panelEnzymes(S.panel).map(function(e){ return e.name; });
+  var o = {}; list.forEach(function(n){ o[n] = 1; });
+  return { has: o, n: list.length };
+}
+
+function render(){
+  var gel = G.resolveGel(gelCfg());
+  var art = buildLanes(shape(), gel);
+  var lanes = S.ladder ? [R.ladderLane('NEB 1 kb Plus', gel)].concat(art) : art.slice();
+  // The shown recipe was solved with every enzyme and up to 3 per digest; flag where that breaks the limits.
+  var allow = allowed(), bad = [], over = 0, nobuf = 0;
+  art.forEach(function(l){
+    if (l.empty) return;
+    if (l.enzymes.length > S.maxEnz) over++;
+    if (l.noBuffer) nobuf++;
+    if (allow) l.enzymes.forEach(function(n){ if (!allow.has[n] && bad.indexOf(n) < 0) bad.push(n); });
+  });
+
+  var stage = document.querySelector('.stage').clientWidth || 700;
+  var widthMm = (S.ruler ? 13 : 3) + lanes.length * 5.5 + 3;
+  var px = Math.max(2.2, Math.min(7, (stage - 44) / widthMm));
+  R.renderGel($('gel'), {
+    lanes: lanes, gel: gelCfg(), pxPerMm: px, dpr: window.devicePixelRatio || 1,
+    palette: S.palette, showRuler: S.ruler, showGrid: S.grid, labelBelow: true
+  });
+
+  var f = fidelity(shape(), art, gel);
+  $('score').textContent = Math.round(f.q * 100) + '%';
+  var pill = $('scorepill');
+  pill.textContent = f.q > .9 ? 'clean' : f.q > .75 ? 'readable' : f.q > .55 ? 'marginal' : 'not worth pouring';
+  pill.style.color = f.q > .75 ? 'var(--good)' : f.q > .55 ? 'var(--accent)' : 'var(--warn)';
+  var sh = shape();
+  var offOpt = sh.time && S.time !== sh.time ? '  \u00b7  best at ' + sh.time + ' min' : '';
+  $('scoredetail').textContent = f.on + ' target bands  \u00b7  ' + f.err.toFixed(1) + ' px error' + offOpt;
+  $('rowpitch').textContent = gel.rowH.toFixed(1) + ' mm';
+  drawCompare(art, gel);
+
+  var digests = {}, temps = {};
+  art.forEach(function(l){ if (!l.empty){ digests[l.plasmid + ':' + l.enzymes.join('+')] = 1; } });
+  var rows = '';
+  art.forEach(function(l, i){
+    if (l.empty){ rows += '<tr class="empty"><td class="n">' + (i+1) + '</td><td colspan="4">empty \u2014 load buffer only</td></tr>'; return; }
+    var t = l.temp || 37;
+    temps[t] = 1;
+    var enzHtml = l.enzymes.map(function(n, j){
+      var disp = (l.products && l.products[j]) || n;
+      return (allow && !allow.has[n]) ? '<span class="offpanel">' + disp + '</span>' : disp;
+    }).join(' + ');
+    rows += '<tr><td class="n">' + (i+1) + '</td><td class="src">' + l.plasmid +
+            '</td><td class="enz">' + enzHtml + '</td><td class="n">' + t +
+            '</td><td class="frag">' + fmtFrags(l) + '</td></tr>';
+  });
+  $('recipes').innerHTML = rows;
+
+  var nd = Object.keys(digests).length, nt = Object.keys(temps);
+  $('gelfoot').innerHTML =
+    '<span>' + lanes.length + ' lanes</span><span>' + nd + ' distinct digest' + (nd === 1 ? '' : 's') +
+    '</span><span>' + gel.rows + ' rows \u00d7 ' + gel.rowH.toFixed(1) + ' mm</span><span>' +
+    (nt.length > 1 ? nt.join(' / ') + ' \u00b0C \u2014 two incubations' : nt[0] + ' \u00b0C') + '</span>';
+
+  var volts = Math.round(S.vcm * CAT.electrodeGapCm);
+  $('cond').innerHTML =
+    '<b>' + shape().name + '</b> \u00b7 ' + shape().size + '<br>' +
+    '<b>' + S.pct.toFixed(1) + ' %</b> agarose \u00b7 1\u00d7 TAE<br>' +
+    '<b>' + S.vcm.toFixed(1) + ' V/cm</b> = ' + volts + ' V over ' + CAT.electrodeGapCm + ' cm<br>' +
+    '<b>' + S.time + ' min</b> \u00b7 ' + (CAT.gel.len - CAT.gel.top) + ' mm of running room';
+  $('checkat').textContent = Math.round(S.time * 0.5) + ' min';
+
+  $('timeval').textContent = S.time + ' min';
+  $('pctval').textContent = S.pct.toFixed(1) + ' %';
+  $('vcmval').textContent = S.vcm.toFixed(1) + ' V/cm = ' + volts + ' V';
+  $('loadval').textContent = S.load + ' ng';
+  var msgs = [];
+  if (bad.length) msgs.push(bad.length + (bad.length === 1 ? ' enzyme is' : ' enzymes are') + ' outside your panel: ' + bad.join(', '));
+  if (over) msgs.push(over + (over === 1 ? ' lane needs' : ' lanes need') + ' more than ' + S.maxEnz + (S.maxEnz === 1 ? ' enzyme' : ' enzymes'));
+  if (nobuf) msgs.push(nobuf + (nobuf === 1 ? ' digest has' : ' digests have') + ' no buffer where every enzyme reaches ' + S.minAct + '%');
+  $('panelwarn').hidden = !msgs.length;
+  if (msgs.length) $('panelwarntext').innerHTML = msgs.join('. ') + '. Press <b>Re-solve at these conditions</b> to search again inside these limits.';
+
+  var plan = digestPlan(art), ph = '', totDna = 0, totVol = 0, worstGly = 0;
+  plan.forEach(function(d){
+    totDna += d.dnaUg; totVol += d.vol; worstGly = Math.max(worstGly, d.gly);
+    var b = d.buffer;
+    var bufCell = b
+      ? '<span class="enz">' + b.buffer + (d.supp && d.supp.length ? ' + ' + d.supp.join(' + ') : '') +
+        '</span><br><span class="frag">' + (b.worst >= 100 ? '100%' : b.worst + '% worst') +
+        (b.star ? ' <span class="offpanel" title="star activity flagged in this buffer">star</span>' : '') + '</span>'
+      : '<span class="offpanel">no shared buffer</span>';
+    ph += '<tr><td><span class="src">' + d.plasmid + '</span> <span class="enz">' + d.products.join(' + ') +
+      '</span><br><span class="frag">lanes ' + d.lanes.join(', ') + '</span></td>' +
+      '<td>' + bufCell + '</td>' +
+      '<td class="n">' + d.n + '</td><td class="n">' + d.dnaUg.toFixed(1) + ' &mu;g</td>' +
+      '<td class="n">' + d.vol + ' &mu;l</td><td class="n">' + d.units + ' U</td>' +
+      '<td class="n">' + d.perLane.toFixed(1) + ' &mu;l</td><td class="n">' + d.temp + '</td></tr>';
+  });
+  $('plan').innerHTML = ph;
+  var bufs = {}; plan.forEach(function(d){ if (d.buffer) bufs[d.buffer.buffer] = (bufs[d.buffer.buffer] || 0) + 1; });
+  var bufSummary = Object.keys(bufs).sort().map(function(b){ return b + ' x' + bufs[b]; }).join(', ');
+  $('planfoot').innerHTML = '<tr><td>' + plan.length + (plan.length === 1 ? ' reaction' : ' reactions') +
+    '</td><td><span class="frag">' + (bufSummary || '&mdash;') + '</span></td><td class="n">' +
+    plan.reduce(function(a, d){ return a + d.n; }, 0) + '</td><td class="n">' +
+    totDna.toFixed(1) + ' &mu;g</td><td class="n">' + totVol + ' &mu;l</td><td colspan="3"></td></tr>';
+  $('planload').textContent = S.load + ' ng';
+  $('glywarn').hidden = worstGly <= 5;
+  if (worstGly > 5) $('glywarntext').textContent =
+    'Highest enzyme fraction is ' + worstGly.toFixed(1) + '% v/v, assuming 20 U/ul stocks. Star activity becomes a risk above 5% - scale the reaction up, or use a high-concentration enzyme.';
+
+  updateCatalogue();
+}
+
+function paintCatalogue(){
+  var html = '';
+  CAT.shapes.forEach(function(s, i){
+    var nd = {}; s.lanes.forEach(function(l){ if (l) nd[l.p + ':' + l.e.join('+')] = 1; });
+    html += '<button data-i="' + i + '" aria-pressed="' + (i === S.shape && !S.custom) + '">' +
+      '<span class="nm">' + s.name + '</span><span class="q" data-q="' + i + '"></span>' +
+      '<span class="bar"><i data-b="' + i + '"></i></span>' +
+      '<span class="meta">' + s.size + ' \u00b7 ' + s.time + ' min \u00b7 ' + Object.keys(nd).length + ' digests</span>' +
+      '</button>';
+  });
+  $('cat').innerHTML = html;
+}
+// Re-score every shape at the current agarose and field, each at its own best run time, so the list
+// stays truthful when the conditions move away from the ones it was computed at.
+function updateCatalogue(){
+  CAT.shapes.forEach(function(s, i){
+    var g = gelCfg(); g.time = s.time;
+    var gel = G.resolveGel(g);
+    var q = Math.round(fidelity(s, buildLanes(s, gel), gel).q * 100);
+    var el = $('cat').querySelector('[data-q="' + i + '"]'), bar = $('cat').querySelector('[data-b="' + i + '"]');
+    if (!el) return;
+    el.textContent = q + '%';
+    el.style.color = q > 85 ? 'var(--good)' : q > 65 ? 'var(--accent)' : 'var(--warn)';
+    bar.style.width = q + '%';
+    bar.style.background = q > 85 ? 'var(--good)' : q > 65 ? 'var(--accent)' : 'var(--warn)';
+  });
+}
+
+// ---- events
+$('cat').addEventListener('click', function(e){
+  var b = e.target.closest('button[data-i]'); if (!b) return;
+  S.shape = +b.dataset.i; S.custom = null;
+  S.time = CAT.shapes[S.shape].time;
+  $('time').value = S.time;
+  paintCatalogue(); render();
+});
+function slider(id, key, parse){
+  $(id).addEventListener('input', function(){ S[key] = parse(this.value); render(); });
+}
+slider('time','time',Number); slider('pct','pct',Number); slider('vcm','vcm',Number); slider('load','load',Number);
+$('pal').addEventListener('click', function(e){
+  var b = e.target.closest('button[data-p]'); if (!b) return;
+  S.palette = b.dataset.p;
+  Array.prototype.forEach.call(this.children, function(c){ c.setAttribute('aria-pressed', c === b); });
+  render();
+});
+$('panel').addEventListener('change', function(){
+  S.panel = this.value;
+  $('stockwrap').hidden = S.panel !== 'stock';
+  render();
+});
+$('stock').addEventListener('input', function(){
+  var r = G.parsePanel(this.value);
+  S.stock = r.names;
+  $('stockcount').textContent = r.names.length + ' recognised' + (r.missing.length ? ', ' + r.missing.length + ' unknown' : '');
+  if (S.panel === 'stock') render();
+});
+$('maxenz').addEventListener('click', function(e){
+  var b = e.target.closest('button[data-m]'); if (!b) return;
+  S.maxEnz = +b.dataset.m;
+  Array.prototype.forEach.call(this.children, function(c){ c.setAttribute('aria-pressed', c === b); });
+  render();
+});
+$('minact').addEventListener('click', function(e){
+  var b = e.target.closest('button[data-a]'); if (!b) return;
+  S.minAct = +b.dataset.a;
+  Array.prototype.forEach.call(this.children, function(c){ c.setAttribute('aria-pressed', c === b); });
+  render();
+});
+['ruler','grid','ladder'].forEach(function(id){
+  $(id).addEventListener('change', function(){ S[id] = this.checked; render(); });
+});
+
+$('resolve').addEventListener('click', function(){
+  var btn = this; btn.disabled = true;
+  var sh = shape(), gel = gelCfg();
+  var target = sh.target.map(function(col){ return col.split('').map(Number); });
+  btn.textContent = 'Searching\u2026';
+  G.solve({
+    plasmids: SOLVE_P, enzymes: G.panelEnzymes(S.panel === 'stock' ? S.stock : S.panel), target: target, gel: gel,
+    times: [S.time], maxEnz: S.maxEnz, minAct: S.minAct,
+    yieldFn: function(){ return new Promise(function(r){ setTimeout(r, 0); }); },
+    onProgress: function(p, label){ btn.textContent = 'Searching ' + label + ' \u2014 ' + Math.round(p * 100) + '%'; }
+  }).then(function(res){
+    S.custom = {
+      name: sh.name + ' (re-solved)', size: sh.size, y0: sh.y0, time: S.time, target: sh.target,
+      lanes: res.lanes.map(function(l){
+        return l.empty ? null : { p: l.options[0].plasmid, e: l.options[0].enzymes, T: l.options[0].temp, err: l.options[0].err };
+      })
+    };
+    Array.prototype.forEach.call($('cat').children, function(c){ c.setAttribute('aria-pressed', false); });
+    btn.disabled = false; btn.textContent = 'Re-solve at these conditions';
+    render();
+  }).catch(function(err){
+    btn.disabled = false; btn.textContent = 'Search failed \u2014 try again';
+    console.error(err);
+  });
+});
+
+var rt;
+window.addEventListener('resize', function(){ clearTimeout(rt); rt = setTimeout(render, 120); });
+if (window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render);
+
+// ---- boot
+$('time').value = S.time; $('pct').value = S.pct; $('vcm').value = S.vcm; $('load').value = S.load;
+$('panel').value = S.panel;
+$('stock').value = G.LAB_PANEL.join(' ');
+$('stockcount').textContent = G.LAB_PANEL.length + ' recognised';
+S.stock = G.LAB_PANEL.slice();
+paintCatalogue();
+render();
+})();
+</script>

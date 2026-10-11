@@ -1,0 +1,6 @@
+.DS_Store
+# Reference inputs and experiment records are kept out of git on purpose.
+/data/
+/Exp092026*
+# Private plasmid catalog (full A_* sequences); overrides the public demo src/data.js when present.
+/src/data.local.js
