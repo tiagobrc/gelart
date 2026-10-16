@@ -125,7 +125,7 @@ footer p{margin:0 0 7px}
   <div>
     <div class="eyebrow">Restriction digest &middot; agarose gel</div>
     <h1>Gel Art</h1>
-    <p class="lede">Pick a shape; the solver searches digests of your 42 plasmids for the enzyme sets whose
+    <p class="lede">Pick a shape; the solver searches digests of your <span id="nPlasmids">loaded</span> plasmids for the enzyme sets whose
       fragments land on the right rows. Every band is computed from the real sequence, using only enzymes
       the lab stocks.</p>
   </div>
@@ -315,7 +315,8 @@ footer p{margin:0 0 7px}
       <h3>More sources widen the alphabet</h3>
       <p>This one is already done, and it mattered more than anything else tried. On pUC19 and pBR322 alone,
          Diagonal, Chevron and Wave were unreachable &mdash; 55 to 59%, because no single plasmid's fragment
-         ladder produces a smooth monotonic sweep. Opening the search to all 42 plasmids lifted them to
+         ladder produces a smooth monotonic sweep. Opening the search to the lab's full set of 42 plasmids (not
+         shipped in this repo) lifted them to
          <b>88 to 91%</b>, and did it while <em>tightening</em> the limit from three enzymes per digest to two.
          Each lane now picks whichever source places its bands best, so the reachable set grows combinatorially
          rather than additively. 27 of the 42 get used across the catalogue.</p>
@@ -327,8 +328,7 @@ footer p{margin:0 0 7px}
   <p><b>The migration model is not yet calibrated to this rig.</b> Band positions come from a literature
      Van Winkle mobility model for TAE, and the run times it predicts disagree with the run sheets in
      Gen091226 by roughly twofold. Treat the shapes as achievable, the clock as provisional.</p>
-  <p>Sequences are read straight from the SnapGene files in <span class="mono">PlasmidDB/</span> (A_1 to A_51,
-     40 circular plasmids, 2961 to 22895 bp) plus pUC19 L09137.2 and pBR322 J01749.1. The digest engine
+  <p>Sequences are <span id="seqNote">the plasmids in the loaded catalogue</span>, including pUC19 L09137.2 and pBR322 J01749.1. The digest engine
      reproduces the published EcoRI, BamHI, HindIII, DraI and PvuII fragment sets exactly. Volts are derived
      from V/cm across the 36.8 cm electrode gap.</p>
   <p>The enzyme panel is the VICTORA_LAB SnapGene set of 2021 combined with the enzymes that appear in
@@ -365,6 +365,12 @@ footer p{margin:0 0 7px}
 var G = window.GelArt, R = window.GelRender, D = window.GELART_DATA;
 var CAT = D.catalog;
 var P = D.seqs.map(function(s){ return {name:s.name, seq:s.seq, circular:s.circular, acc:s.acc}; });
+(function(){ // describe the catalogue that actually loaded (public demo = 2 plasmids, a private data.local.js = more)
+  var lens = P.map(function(p){ return p.seq.length; }), circ = P.filter(function(p){ return p.circular; }).length;
+  document.getElementById('nPlasmids').textContent = P.length;
+  document.getElementById('seqNote').textContent = 'the ' + P.length + ' plasmids in the loaded catalogue (' + circ +
+    ' circular, ' + Math.min.apply(null, lens) + ' to ' + Math.max.apply(null, lens) + ' bp)';
+})();
 // catalogue lane.p indexes the plasmid list used at precompute time \u2014 map by name, not position
 var PMAP = CAT.plasmids.map(function(cp){ var i = P.findIndex(function(p){ return p.name === cp.name; }); return i < 0 ? 0 : i; });
 
