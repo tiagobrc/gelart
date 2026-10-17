@@ -22,11 +22,16 @@ See below to use your own.
 
 ## Examples
 
-All images are from the demo catalogue (pUC19 + pBR322, 1.2 % agarose in 1x TAE, 4 V/cm, 147 V across
-a 36.8 cm electrode gap, EtBr / UV rendering). The page follows your system colour scheme; these
-were rendered in dark mode.
+These images were rendered from the Victora lab's own catalogue of 42 plasmids, to show what the tool
+can do with a larger, more varied set. That catalogue is unpublished and is not in this repository. A fresh clone
+ships only pUC19 and pBR322, which reach 32 to 71 % on the same shapes; the images from that
+demo catalogue are in [`docs/img/demo/`](docs/img/demo).
 
-![The Gel Art page with Heart (filled) selected: shape catalogue and run conditions on the left, predicted gel, target vs predicted grid, lane recipes and digest plan on the right](docs/img/app.png)
+Conditions: 1.2 % agarose in 1x TAE, 4 V/cm (147 V across a 36.8 cm electrode gap), at most two enzymes
+per digest from the lab stock, one buffer carrying every enzyme at ≥ 50 %, EtBr / UV rendering. The page
+follows your system colour scheme; these were rendered in dark mode.
+
+![The Gel Art page with Heart (filled) selected: shape catalogue and run conditions on the left, predicted gel and target vs predicted grid on the right](docs/img/app.png)
 
 Each cell below shows the predicted gel, and under it the target against the prediction: an outlined
 cell is a row the shape asks for, and a filled cell is the band intensity the digest actually puts
@@ -34,26 +39,26 @@ there. The percentage is the solver's match score, and the verdict is the page's
 
 <table>
   <tr>
-    <th>Heart (filled), 9 × 8 grid, 60 min, 4 digests<br>71 % — marginal</th>
-    <th>Invader, 11 × 8 grid, 60 min, 5 digests<br>59 % — marginal</th>
+    <th>Heart (filled), 9 × 8 grid, 90 min, 5 digests<br>99 % — clean</th>
+    <th>Double helix, 20 × 8 grid, 120 min, 4 digests<br>95 % — clean</th>
   </tr>
   <tr>
     <td><img src="docs/img/heart-filled-gel.png" alt="Predicted gel for Heart (filled)" width="400"><br><img src="docs/img/heart-filled-target.png" alt="Target vs predicted grid for Heart (filled)" width="200"></td>
+    <td><img src="docs/img/double-helix-gel.png" alt="Predicted gel for Double helix" width="400"><br><img src="docs/img/double-helix-target.png" alt="Target vs predicted grid for Double helix" width="200"></td>
+  </tr>
+  <tr>
+    <th>Invader, 11 × 8 grid, 90 min, 6 digests<br>93 % — clean</th>
+    <th>Smiley, 10 × 10 grid, 120 min, 5 digests<br>85 % — readable</th>
+  </tr>
+  <tr>
     <td><img src="docs/img/invader-gel.png" alt="Predicted gel for Invader" width="400"><br><img src="docs/img/invader-target.png" alt="Target vs predicted grid for Invader" width="200"></td>
-  </tr>
-  <tr>
-    <th>Square, 9 × 14 grid, 150 min, 2 digests<br>54 % — not worth pouring</th>
-    <th>Chevron, 20 × 5 grid, 150 min, 4 digests<br>34 % — not worth pouring</th>
-  </tr>
-  <tr>
-    <td><img src="docs/img/square-gel.png" alt="Predicted gel for Square" width="400"><br><img src="docs/img/square-target.png" alt="Target vs predicted grid for Square" width="200"></td>
-    <td><img src="docs/img/chevron-gel.png" alt="Predicted gel for Chevron" width="400"><br><img src="docs/img/chevron-target.png" alt="Target vs predicted grid for Chevron" width="200"></td>
+    <td><img src="docs/img/smiley-gel.png" alt="Predicted gel for Smiley" width="400"><br><img src="docs/img/smiley-target.png" alt="Target vs predicted grid for Smiley" width="200"></td>
   </tr>
 </table>
 
-Heart (filled) and Invader are the two best shapes this catalogue reaches, Square is third, and Chevron is
-the weakest of the 16 — it shows where two plasmids run out of fragment sizes. These are predictions from
-an uncalibrated model, not photographs of gels.
+All 16 shapes score 85 % or better on this catalogue (Heart (filled) and Equals at 99 %, Smiley at 85 %); the
+page rates 13 of them "clean" and 3 "readable". These are predictions from an uncalibrated model, not
+photographs of gels.
 
 ## What you can set
 
@@ -139,9 +144,14 @@ src/render.js          gel rendering
 src/data.js            demo catalogue and sequences (pUC19, pBR322)
 src/precompute*.js     build a catalogue (need data/, not shipped)
 calibration/           bench sheet generator + fitter, measurement sheets
-docs/img/              screenshots used in this README (demo catalogue)
+docs/img/              screenshots used in this README (docs/img/demo/ = the shipped demo catalogue)
+LICENSE                MIT
 test/                  run with: jsc src/core.js test/<file>.js
 ```
 
 `test/test_calib.js` runs from a plain clone (`$JSC src/core.js test/test_calib.js`). The others read
 files from `data/`. The engine has no dependencies and no DOM, so it runs in a browser or any JS shell.
+
+## License
+
+MIT; see [LICENSE](LICENSE).
